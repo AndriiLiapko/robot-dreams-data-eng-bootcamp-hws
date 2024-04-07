@@ -1,8 +1,6 @@
 from typing import Dict
 
-
 API_ENDPOINT: str = 'https://fake-api-vycpfa6oca-uc.a.run.app/sales'
-
 
 SCHEMA: Dict = {
     'doc': 'Sales Data',
