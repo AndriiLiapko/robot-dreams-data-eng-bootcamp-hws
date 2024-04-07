@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(logging.INFO)
 
-API_ENDPOINT = 'https://fake-api-vycpfa6oca-uc.a.run.app/sales'
+API_ENDPOINT: str = 'https://fake-api-vycpfa6oca-uc.a.run.app/sales'
 
 
 def fetch_data(endpoint: str, date: str, page: int) -> Response:
@@ -20,6 +20,7 @@ def fetch_data(endpoint: str, date: str, page: int) -> Response:
         params={'date': date, 'page': page},
         headers={'Authorization': os.environ['AUTH_TOKEN']},
     )
+
 
 @app.route('/', methods=['POST'])
 def job():

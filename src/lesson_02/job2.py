@@ -3,15 +3,16 @@ import os
 import json
 import logging
 
-from fastavro import writer, reader, parse_schema
+from fastavro import writer, parse_schema
 from flask import Flask, request, jsonify
+from typing import Dict
 
 app = Flask(__name__)
 
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(logging.INFO)
 
-SCHEMA = {
+SCHEMA: Dict = {
     'doc': 'Sales Data',
     'name': 'Sales',
     'namespace': 'sales',
