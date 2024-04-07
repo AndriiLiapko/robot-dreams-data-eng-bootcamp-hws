@@ -5,25 +5,13 @@ import logging
 
 from fastavro import writer, parse_schema
 from flask import Flask, request, jsonify
-from typing import Dict
+
+from lesson_02.defs import SCHEMA
 
 app = Flask(__name__)
 
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(logging.INFO)
-
-SCHEMA: Dict = {
-    'doc': 'Sales Data',
-    'name': 'Sales',
-    'namespace': 'sales',
-    'type': 'record',
-    'fields': [
-        {'name': 'client', 'type': 'string'},
-        {'name': 'purchase_date', 'type': 'string'},
-        {'name': 'product', 'type': 'string'},
-        {'name': 'price', 'type': 'int'},
-    ],
-}
 
 PARSED_SCHEMA = parse_schema(SCHEMA)
 

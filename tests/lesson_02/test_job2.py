@@ -3,7 +3,7 @@ import shutil
 import tempfile
 import unittest
 import json
-from src.lesson_02.job2 import app
+from lesson_02.job2 import app
 
 
 class TestJob2(unittest.TestCase):
@@ -72,7 +72,6 @@ class TestJob2(unittest.TestCase):
         # Assert directory is empty
         files_in_stg_dir = os.listdir(stg_dir)
         self.assertEqual(len(files_in_stg_dir), 0)
-
 
 
 if __name__ == '__main__':

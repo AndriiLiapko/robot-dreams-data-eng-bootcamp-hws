@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from unittest.mock import patch, MagicMock
 import json
-from src.lesson_02.job1 import app
+from lesson_02.job1 import app
 
 
 class TestJob1(unittest.TestCase):
