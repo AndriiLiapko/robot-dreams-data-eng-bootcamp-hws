@@ -4,14 +4,14 @@ import requests
 import json
 import logging
 
+from http import HTTPStatus
 from flask import Flask, request, jsonify, Response
+from src.lesson_02.settings import API_ENDPOINT
 
 app = Flask(__name__)
 
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(logging.INFO)
-
-API_ENDPOINT: str = 'https://fake-api-vycpfa6oca-uc.a.run.app/sales'
 
 
 def fetch_data(endpoint: str, date: str, page: int) -> Response:
@@ -38,13 +38,7 @@ def job():
     os.makedirs(target_path)
 
     page: int = 1
-    while True:
-        response = fetch_data(API_ENDPOINT, target_date, page)
-
-        if response.status_code == 404:
-            app.logger.info(f'Fetch date={target_date}, page={page} Response code: {response.status_code}')
-            break
-
+    while (response := fetch_data(API_ENDPOINT, target_date, page)).status_code != HTTPStatus.NOT_FOUND:
         app.logger.info(f'Fetch date={target_date}, page={page} Response code: {response.status_code}')
 
         content = response.json()
@@ -57,7 +51,7 @@ def job():
         page += 1
 
     app.logger.info("Request has been processed")
-    return jsonify({'message': 'Request processed successfully'}), 201
+    return jsonify({'message': 'Request processed successfully'}), HTTPStatus.CREATED
 
 
 if __name__ == '__main__':

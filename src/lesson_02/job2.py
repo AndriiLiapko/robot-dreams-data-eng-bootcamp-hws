@@ -2,18 +2,17 @@ import shutil
 import os
 import json
 import logging
+from http import HTTPStatus
 
-from fastavro import writer, parse_schema
+from fastavro import writer
 from flask import Flask, request, jsonify
 
-from lesson_02.defs import SCHEMA
+from src.lesson_02.settings import PARSED_SCHEMA
 
 app = Flask(__name__)
 
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(logging.INFO)
-
-PARSED_SCHEMA = parse_schema(SCHEMA)
 
 
 @app.route('/', methods=['POST'])
@@ -26,7 +25,7 @@ def job():
     stg_dir = request.get_json()['stg_dir']
 
     if not os.path.exists(raw_dir):
-        return jsonify({'message': f'JSON data is not available in {raw_dir}'}), 404
+        return jsonify({'message': f'JSON data is not available in {raw_dir}'}), HTTPStatus.NOT_FOUND
 
     if os.path.exists(stg_dir):
         shutil.rmtree(stg_dir)
@@ -47,7 +46,7 @@ def job():
             writer(out, PARSED_SCHEMA, data)
 
     app.logger.info("Request has been processed")
-    return jsonify({'message': 'Request processed successfully'}), 201
+    return jsonify({'message': 'Request processed successfully'}), HTTPStatus.CREATED
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 from typing import Dict
 
+from fastavro import parse_schema
+
 API_ENDPOINT: str = 'https://fake-api-vycpfa6oca-uc.a.run.app/sales'
 
 SCHEMA: Dict = {
@@ -14,3 +16,5 @@ SCHEMA: Dict = {
         {'name': 'price', 'type': 'int'},
     ],
 }
+
+PARSED_SCHEMA = parse_schema(SCHEMA)
