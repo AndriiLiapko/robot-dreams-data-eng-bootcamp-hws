@@ -1,7 +1,3 @@
-# Flask Application
-
-This is a Flask application designed to [provide a brief description of what your application does].
-
 ## Setup Environment
 
 To set up the environment for this Flask application, follow these steps:
