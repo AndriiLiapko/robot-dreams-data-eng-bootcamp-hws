@@ -1,24 +1,15 @@
-import shutil
 import os
-import json
 import logging
 from http import HTTPStatus
-
-from fastavro import writer
 from flask import Flask, request, jsonify
 
-from src.lesson_02.settings import PARSED_SCHEMA
+from lesson_02.utils import create_path, map_files_to_location, get_json_file, write_avro_file
 
 app = Flask(__name__)
-
-app.logger.addHandler(logging.StreamHandler())
-app.logger.setLevel(logging.INFO)
 
 
 @app.route('/', methods=['POST'])
 def job():
-    app.logger.info('Received request')
-    app.logger.info('Start parsing data')
     app.logger.info(request.get_json())
 
     raw_dir = request.get_json()['raw_dir']
@@ -27,25 +18,15 @@ def job():
     if not os.path.exists(raw_dir):
         return jsonify({'message': f'JSON data is not available in {raw_dir}'}), HTTPStatus.NOT_FOUND
 
-    if os.path.exists(stg_dir):
-        shutil.rmtree(stg_dir)
+    create_path(stg_dir)
 
-    os.makedirs(stg_dir)
-
-    file_locations = {
-        os.path.join(raw_dir, f): f
-        for f in os.listdir(raw_dir)
-        if os.path.isfile(os.path.join(raw_dir, f))
-    }
+    file_locations = map_files_to_location(raw_dir)
 
     for file_location, file_name in file_locations.items():
-        with open(file_location, "r") as f:
-            data = json.load(f)
+        data = get_json_file(file_location)
+        out_file_path = os.path.join(stg_dir, file_name.replace('.json', '.avro'))
+        write_avro_file(out_file_path, data)
 
-        with open(os.path.join(stg_dir, file_name.replace('.json', '.avro')), 'wb') as out:
-            writer(out, PARSED_SCHEMA, data)
-
-    app.logger.info("Request has been processed")
     return jsonify({'message': 'Request processed successfully'}), HTTPStatus.CREATED
 
 

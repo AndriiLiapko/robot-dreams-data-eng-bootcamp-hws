@@ -19,7 +19,7 @@ class TestJob1(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
 
-    @patch('src.lesson_02.job1.requests.get')
+    @patch('src.lesson_02.utils.requests.get')
     def test_job_e2e_happy_path(self, mock_get):
         expected_content_file_1 = [{'data': 'some_data'}]
         expected_content_file_2 = [{'data': 'some_data'}, {'data': 'some_more_data'}]
@@ -51,7 +51,7 @@ class TestJob1(unittest.TestCase):
             file2_content = json.load(file2)
             self.assertEqual(file2_content, expected_content_file_2)
 
-    @patch('src.lesson_02.job1.requests.get')
+    @patch('src.lesson_02.utils.requests.get')
     def test_job_e2e_no_data_and_no_errors_path(self, mock_get):
 
         mock_get.side_effect = [
