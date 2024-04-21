@@ -95,8 +95,16 @@ Port for flask_job_1_fetch: ```8082```
 
 For both the host is:  ```http://host.docker.internal```
 
+#### Set the BASE_DIR env variable
+
 The BASE_DIR env variable is specified in docker-compose file for Airflow to fetch
 
 ```BASE_DIR: 'D:\learning\robot-dreams-data-eng-bootcamp-hws\'```
+
+#### Create .env file
+Create the .env file in the lesson_07 folder. Then open terminal and type:
+```
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+```
 
 Once above steps are done, you can trigger the DAG.
