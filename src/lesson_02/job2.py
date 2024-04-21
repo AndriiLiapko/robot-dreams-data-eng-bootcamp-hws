@@ -3,17 +3,25 @@ import logging
 from http import HTTPStatus
 from flask import Flask, request, jsonify
 
-from lesson_02.utils import create_path, map_files_to_location, get_json_file, write_avro_file
+from lesson_02.utils import create_path, map_files_to_location, get_json_file, write_avro_file, get_and_format_path
 
 app = Flask(__name__)
+
+app.logger.setLevel(logging.INFO)
+handler = logging.FileHandler('app.log')
+app.logger.addHandler(handler)
+
+
+@app.before_request
+def log_request_info():
+    app.logger.info('Headers: %s', request.headers)
+    app.logger.info('Body: %s', request.data.decode('utf-8'))
 
 
 @app.route('/', methods=['POST'])
 def job():
-    app.logger.info(request.get_json())
-
-    raw_dir = request.get_json()['raw_dir']
-    stg_dir = request.get_json()['stg_dir']
+    app.logger.info('Received POST request')
+    raw_dir, stg_dir = get_and_format_path(request.data)
 
     if not os.path.exists(raw_dir):
         return jsonify({'message': f'JSON data is not available in {raw_dir}'}), HTTPStatus.NOT_FOUND
@@ -27,6 +35,7 @@ def job():
         out_file_path = os.path.join(stg_dir, file_name.replace('.json', '.avro'))
         write_avro_file(out_file_path, data)
 
+    app.logger.info('Finished execution')
     return jsonify({'message': 'Request processed successfully'}), HTTPStatus.CREATED
 
 

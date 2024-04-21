@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from typing import Dict
+from typing import Dict, Tuple
 
 import requests
 from fastavro import writer
@@ -221,3 +221,41 @@ def write_avro_file(save_to_file: str, data: dict) -> None:
     """
     with open(save_to_file, 'wb') as out:
         writer(out, PARSED_SCHEMA, data)
+
+
+def get_and_format_path(request_body: bytes) -> Tuple[str, str]:
+    """
+    Get and format path based on request body data.
+
+    Args:
+        request_body (bytes): The byte string representing the request body.
+
+    Returns:
+        Tuple[str, str]: A tuple containing the raw directory and formatted date or staging directory.
+
+    This function decodes and cleans up the `request_body`, then checks if the 'date' key exists
+    in the decoded data. If present, it means that it is the body for the job 1 it then returns the 'raw_dir'
+    and the formatted date extracted from the 'date' key. Otherwise, it returns the 'raw_dir' and the 'stg_dir', which
+    is expected body for the job 2, from the decoded data.
+    """
+    data = decode_and_cleanup_request_body(request_body)
+    if 'date' in data.keys():
+        return data['raw_dir'], data['date'].split(" ")[0]
+    return data['raw_dir'], data['stg_dir']
+
+
+def decode_and_cleanup_request_body(request_body: bytes) -> Dict[str, str]:
+    """
+    Decode and clean up a request body.
+
+    Args:
+        request_body (bytes): The byte string representing the request body.
+
+    Returns:
+        Dict[str, str]: A dictionary containing decoded and cleaned up key-value pairs.
+
+    This function takes a byte string `request_body`, decodes it as UTF-8, and then replaces
+    any backslashes with double backslashes. It then loads the cleaned up JSON string into
+    a dictionary and returns it.
+    """
+    return json.loads(request_body.decode('utf-8').replace('\\', '\\\\'))
