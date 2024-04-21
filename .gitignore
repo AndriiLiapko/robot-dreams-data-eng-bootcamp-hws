@@ -178,7 +178,7 @@ cython_debug/
 !copyrights
 !misc.xml
 !sqldialects.xml
-
+!src
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
@@ -186,3 +186,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+!/src/lesson_07/
