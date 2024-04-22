@@ -66,6 +66,45 @@ Example json body to use as a body for Job 2:
        "stg_dir": "some-path\\stg_dir\\sales\\2022-08-10"
    }
 ```
+## Set up and run Airflow
+Folder lesson_07 contains the docker-compose.yaml file with the configuration to run Airflow in Docker with local
+executor. The config done in such a way that allows to do post requests to Job 1 and Job 2 which are running outside the docker.
+In order to run the Airflow and jobs:
 
+#### Initialize Airflow db
+Go to the lesson_07, and then from command line run:
+ ```
+ docker-compose up airflow-init
+ ```
+#### Run docker-compose
+One initialization of Airflow is completed, run the docker-compose:
+ ```
+ docker-compose up
+ ```
+#### Create http connections in Airflow admin
+2 out of 3 tasks in the dag are making POST requests to Job 1 and Job 2. For doing this,
+go to Connection on Airflow UI and create 2 HTTP connection. 
 
+First connection ID:  ```flask_job_1_fetch```
 
+Port for flask_job_1_fetch: ```8081```
+
+Second connection ID:  ```flask_job_2_convert_to_avro```
+
+Port for flask_job_1_fetch: ```8082```
+
+For both the host is:  ```http://host.docker.internal```
+
+#### Set the BASE_DIR env variable
+
+The BASE_DIR env variable is specified in docker-compose file for Airflow to fetch
+
+```BASE_DIR: 'D:\learning\robot-dreams-data-eng-bootcamp-hws\'```
+
+#### Create .env file
+Create the .env file in the lesson_07 folder. Then open terminal and type:
+```
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+```
+
+Once above steps are done, you can trigger the DAG.
