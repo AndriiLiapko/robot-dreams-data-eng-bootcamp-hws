@@ -1,8 +1,6 @@
-import json
 import os
 from datetime import datetime
 
-import requests
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
