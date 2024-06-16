@@ -1,4 +1,5 @@
 from airflow import DAG
+from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime, timedelta
 
@@ -33,4 +34,21 @@ with DAG(
         skip_leading_rows=1,
         write_disposition='WRITE_TRUNCATE',
     )
+
+    clean_and_load_to_silver = BigQueryExecuteQueryOperator(
+        task_id='transform_to_silver',
+        sql='''
+            CREATE OR REPLACE TABLE silver.sales AS
+            SELECT
+                CAST(CustomerId AS STRING) AS client_id,
+                CAST(PurchaseDate AS TIMESTAMP) AS purchase_date,
+                CAST(Product AS STRING) AS product_name,
+                CAST(Price AS FLOAT64) AS price
+            FROM bronze.sales
+            WHERE SAFE_CAST(Price AS FLOAT64) IS NOT NULL
+            ''',
+        use_legacy_sql=False,
+    )
+
+    load_to_bronze >> clean_and_load_to_silver
 
