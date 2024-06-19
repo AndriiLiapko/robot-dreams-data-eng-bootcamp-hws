@@ -2,6 +2,8 @@ from airflow import DAG
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime, timedelta
 
+from schemas import user_profiles_schema
+
 default_args = {
     'start_date': datetime(2022, 9, 1),
     'retries': 1,
@@ -22,13 +24,7 @@ with DAG(
         destination_project_dataset_table='silver.user_profiles',
         source_format='NEWLINE_DELIMITED_JSON',
         write_disposition='WRITE_TRUNCATE',
-        schema_fields=[
-            {'name': 'email', 'type': 'STRING', 'mode': 'REQUIRED'},
-            {'name': 'full_name', 'type': 'STRING', 'mode': 'REQUIRED'},
-            {'name': 'state', 'type': 'STRING', 'mode': 'REQUIRED'},
-            {'name': 'birth_date', 'type': 'DATE', 'mode': 'REQUIRED'},
-            {'name': 'phone_number', 'type': 'STRING', 'mode': 'REQUIRED'},
-        ],
+        schema_fields=user_profiles_schema,
     )
 
     load_to_silver

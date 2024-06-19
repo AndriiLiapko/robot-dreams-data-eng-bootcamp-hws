@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 import pendulum
 import logging
 
+from schemas import bronze_customers_schema
+from queries import populate_silver_customers
+
 default_args = {
     'start_date': datetime(2022, 8, 1),
     'retries': 1,
@@ -50,14 +53,7 @@ with DAG(
         bucket='de-final-project-data',
         source_objects=list_gcs_files.output,
         destination_project_dataset_table='bronze.customers',
-        schema_fields=[
-            {'name': 'ClientId', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'FirstName', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'LastName', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'Email', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'RegistrationDate', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'State', 'type': 'STRING', 'mode': 'NULLABLE'},
-        ],
+        schema_fields=bronze_customers_schema,
         source_format='CSV',
         skip_leading_rows=1,
         write_disposition='WRITE_TRUNCATE',
@@ -65,17 +61,7 @@ with DAG(
 
     transform_to_silver = BigQueryExecuteQueryOperator(
         task_id='transform_to_silver',
-        sql='''
-        CREATE OR REPLACE TABLE silver.customers AS
-        SELECT
-            CAST(ClientId AS STRING) AS client_id,
-            CAST(FirstName AS STRING) AS first_name,
-            CAST(LastName AS STRING) AS last_name,
-            CAST(Email AS STRING) AS email,
-            CAST(RegistrationDate AS TIMESTAMP) AS registration_date,
-            CAST(State AS STRING) AS state
-        FROM bronze.customers
-        ''',
+        sql=populate_silver_customers,
         use_legacy_sql=False,
     )
 
